@@ -20,6 +20,13 @@ class Category extends Model
     protected $autoWriteTimestamp = true;
     
     /**
+     * 字段限制
+     * @return Category
+     */
+    public static function fieldLimit(){
+        return self::field('id,name,pid,create_time,update_time');
+    }
+    /**
      * 获取树形节点
      * @param int $id 需要隐藏的节点id
      * @param string $default 默认第一个节点项，默认为“顶级节点”，如果为false则不显示，也可传入其他名称

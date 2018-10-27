@@ -20,13 +20,15 @@ class AuthUsers extends Base
     protected $_username="username";
     protected $_password="password";
     
+    protected $_auth_id;
+    
     public function __construct(Request $request = null)
     {
         parent::__construct($request);
         
         $except=['login'];
         if (!in_array(Request::instance()->action(),$except)){
-            $check=$this->_check();
+            $check=$this->_check(true);
             if(!is_numeric($check)){
                 throw new \think\exception\HttpException($check['status_code'], $check['message']);
             }
@@ -61,7 +63,7 @@ class AuthUsers extends Base
      * @return \think\response\Json
      */
     public function logout(){
-        $check=$this->_check();
+        $check=$this->_check(true);
         if(is_numeric($check)){
             Db::name('guard_tokens')->where('id',$check)->update([
                 'is_logout'=>1,
@@ -79,7 +81,7 @@ class AuthUsers extends Base
      * 是否登录
      * @return array|bool
      */
-    protected function _check(){
+    protected function _check($status=false){
         $authorization = Request::instance()->header('authorization');
         $authorization=explode(' ',$authorization);
         if(count($authorization)==2){
@@ -92,7 +94,23 @@ class AuthUsers extends Base
                 ])->find();
                 if($guard_token){
                     if($guard_token['is_forever']==1 || $guard_token['create_time']+$guard_token['expires_in']>time()){
-                        return $guard_token['id'];
+                        $user=Db::name($guard_token['guard'])->find($guard_token['relate_id']);
+                        if($user){
+                            if($status && $user['status']==1){
+                                $this->_auth_id=$user['id'];
+                                return $guard_token['id'];
+                            }else{
+                                return [
+                                    'message'=>'该用户已禁用',
+                                    'status_code'=>400,
+                                ];
+                            }
+                        }else{
+                            return [
+                                'message'=>'该用户已丢失',
+                                'status_code'=>400,
+                            ];
+                        }
                     }
                 }
             }
@@ -101,6 +119,12 @@ class AuthUsers extends Base
             'message'=>'token认证出错',
             'status_code'=>401,
         ];
+    }
+    /**
+     * @return mixed
+     */
+    protected function _auth_id(){
+        return $this->_auth_id;
     }
     /**
      * 尝试登录
@@ -123,7 +147,7 @@ class AuthUsers extends Base
                     }
                 }
                 $access_token=random(323);
-                $expires_in=max((int)config('custom.auth_expires_in'),0);
+                $expires_in=max((int)config('custom.api_expires_in'),0);
                 $timestamp=time();
                 Db::name('guard_tokens')->insert([
                     'access_token'=>$access_token,
@@ -131,6 +155,7 @@ class AuthUsers extends Base
                     'token_type'=>$this->_token_type,
                     'expires_in'=>$expires_in,
                     'is_forever'=>$expires_in==0?1:0,
+                    'relate_id'=>$user['id'],
                     'create_time'=>$timestamp,
                     'update_time'=>$timestamp,
                 ]);

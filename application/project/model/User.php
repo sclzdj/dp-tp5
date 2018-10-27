@@ -17,4 +17,11 @@ class USer extends Model
     // 自动写入时间戳
     protected $autoWriteTimestamp = true;
     
+    /**
+     * 字段限制
+     * @return Category
+     */
+    public static function fieldLimit(){
+        return self::field('id,username,nickname,status,create_time,update_time');
+    }
 }

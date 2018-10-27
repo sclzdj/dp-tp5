@@ -18,6 +18,10 @@ trait Api
     
     protected function _apiRun(){
         $this->_request=Request::instance()->param();
+        //接口请求次数限制
+        if(config('custom.api_limit_num')>0){
+            $this->_limitRequestRate();
+        }
         //开启接口日志记录
         if(config('custom.api_log_on')){
             $this->_requestLog();
@@ -57,6 +61,7 @@ trait Api
             unset($request['action']);
         }
         $log['data']=json_encode($request,JSON_UNESCAPED_UNICODE);
+        $log['restrict']=Request::instance()->ip().'_'.Request::instance()->module().'_'.Request::instance()->controller().'_'.Request::instance()->action();
         $timestamp=time();
         $log['create_time']=$timestamp;
         $log['update_time']=$timestamp;
@@ -120,5 +125,31 @@ trait Api
             $pageURL .= (isset($_SERVER["SERVER_NAME"])?$_SERVER["SERVER_NAME"]:'') . (isset($_SERVER["REQUEST_URI"])?$_SERVER["REQUEST_URI"]:'');
         }
         return $pageURL;
+    }
+    /**
+     * 接口请求次数限制
+     */
+    public function _limitRequestRate()
+    {
+        $api_limit_num=config('custom.api_limit_num');
+        $ip=Request::instance()->ip();
+        $module=Request::instance()->module();
+        $controller=Request::instance()->controller();
+        $action=Request::instance()->action();
+        $method=Request::instance()->method();
+        $timestamp=time();
+        $num=Db::name('request_limits')->where(compact('ip','module','controller','action','method'))->where('create_time <= '.$timestamp.' && create_time > '.($timestamp-60))->count('id');
+        if($num>=$api_limit_num){
+            throw new \think\exception\HttpException(400, '同一接口每分钟只能请求'.$api_limit_num.'次');
+        }
+        Db::name('request_limits')->insert([
+            'ip'=>$ip,
+            'module'=>$module,
+            'controller'=>$controller,
+            'action'=>$action,
+            'method'=>$method,
+            'create_time'=>$timestamp,
+            'update_time'=>$timestamp,
+        ]);
     }
 }
