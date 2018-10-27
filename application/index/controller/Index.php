@@ -25,4 +25,10 @@ class Index extends Home
         }
         return '<style type="text/css">*{ padding: 0; margin: 0; } .think_default_text{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> '.config("dolphin.product_name").' '.config("dolphin.product_version").'<br/><span style="font-size:30px">极速 · 极简 · 极致</span></p></div>';
     }
+    
+    public function test()
+    {
+        echo '<form action="http://dt5.dj/upload" method="post" enctype="multipart/form-data"><input type="text" name="type" value="image"><input name="file" type="file" /><input type="submit" value="上传" /></form>';//上传图片接口测试
+        die;
+    }
 }

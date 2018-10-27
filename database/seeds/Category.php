@@ -16,7 +16,7 @@ class Category extends Seeder
     {
         \think\Db::execute('truncate table '.config('database.prefix').'categorys');
         $insert=[];
-        for($i=0;$i<mt_rand(2,10);$i++){
+        for($i=0;$i<10;$i++){
             $insert[]=['name'=>random(mt_rand(2,10)),'pid'=>0];
         }
         foreach ($insert as $key=>$value){

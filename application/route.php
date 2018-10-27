@@ -8,6 +8,12 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
+use think\Route;
+
+Route::post('upload','index/Upload/index');//上传文件
+Route::post('login/users','api/AuthUsers/login');//登录
+Route::get('logout/users','api/AuthUsers/logout');//退出
+Route::controller('category','api/Category');
 
 return [
     '__pattern__' => [
@@ -17,5 +23,4 @@ return [
         ':id'   => ['index/hello', ['method' => 'get'], ['id' => '\d+']],
         ':name' => ['index/hello', ['method' => 'post']],
     ],
-
 ];

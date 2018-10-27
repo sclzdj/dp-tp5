@@ -3,7 +3,7 @@
 use think\migration\Migrator;
 use think\migration\db\Column;
 
-class Categorys extends Migrator
+class RequestLogs extends Migrator
 {
     /**
      * Change Method.
@@ -29,10 +29,16 @@ class Categorys extends Migrator
     public function change()
     {
         // create the table
-        $table = $this->table('categorys',array('engine'=>config('custom.table_engine'),'comment'=>'分类'));
-        $table->addColumn('name', 'string',array('limit' => 191,'default'=>'','comment'=>'名称'))
-            ->addColumn('pid', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'父级id'))
-            ->addColumn('sort', 'integer',array('signed'=>false,'limit' => 11,'default'=>100,'comment'=>'排序，升序取数据'))
+        $table = $this->table('request_logs',array('engine'=>config('custom.table_engine'),'comment'=>'接口日志'));
+        $table->addColumn('url', 'text',array('comment'=>'完整接口地址'))
+            ->addColumn('type', 'string',array('limit' => 191,'default'=>'','comment'=>'请求类型'))
+            ->addColumn('authorization', 'text',array('comment'=>'认证凭据'))
+            ->addColumn('data', 'text',array('comment'=>'请求参数'))
+            ->addColumn('sign', 'string',array('limit' => 191,'default'=>'','comment'=>'签名'))
+            ->addColumn('ip', 'string',array('limit' => 191,'default'=>'','comment'=>'请求ip'))
+            ->addColumn('terminal', 'string',array('limit' => 191,'default'=>'','comment'=>'请求终端'))
+            ->addColumn('brower', 'string',array('limit' => 191,'default'=>'','comment'=>'请求浏览器'))
+            ->addColumn('agent', 'text',array('comment'=>'代理信息'))
             ->addColumn('create_time', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'创建时间'))
             ->addColumn('update_time', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'修改时间'))
             ->create();

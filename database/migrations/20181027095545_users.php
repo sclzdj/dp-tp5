@@ -3,7 +3,7 @@
 use think\migration\Migrator;
 use think\migration\db\Column;
 
-class Categorys extends Migrator
+class Users extends Migrator
 {
     /**
      * Change Method.
@@ -28,13 +28,14 @@ class Categorys extends Migrator
      */
     public function change()
     {
-        // create the table
-        $table = $this->table('categorys',array('engine'=>config('custom.table_engine'),'comment'=>'分类'));
-        $table->addColumn('name', 'string',array('limit' => 191,'default'=>'','comment'=>'名称'))
-            ->addColumn('pid', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'父级id'))
-            ->addColumn('sort', 'integer',array('signed'=>false,'limit' => 11,'default'=>100,'comment'=>'排序，升序取数据'))
+        $table = $this->table('users',array('engine'=>config('custom.table_engine'),'comment'=>'用户'));
+        $table->addColumn('username', 'string',array('limit' => 191,'default'=>'','comment'=>'用户名'))
+            ->addColumn('password', 'string',array('limit' => 191,'default'=>'','comment'=>'密码'))
+            ->addColumn('nickname', 'string',array('limit' => 191,'default'=>'','comment'=>'昵称'))
+            ->addColumn('status', 'integer',array('signed'=>false,'limit' => \Phinx\Db\Adapter\MysqlAdapter::INT_TINY,'default'=>1,'comment'=>'账号状态0:禁用 1:开启'))
             ->addColumn('create_time', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'创建时间'))
             ->addColumn('update_time', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'修改时间'))
+            ->addIndex(array('username'), array('unique' => true))
             ->create();
     }
 }

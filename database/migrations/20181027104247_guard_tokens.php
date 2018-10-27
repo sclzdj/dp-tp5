@@ -3,7 +3,7 @@
 use think\migration\Migrator;
 use think\migration\db\Column;
 
-class Categorys extends Migrator
+class GuardTokens extends Migrator
 {
     /**
      * Change Method.
@@ -28,13 +28,16 @@ class Categorys extends Migrator
      */
     public function change()
     {
-        // create the table
-        $table = $this->table('categorys',array('engine'=>config('custom.table_engine'),'comment'=>'分类'));
-        $table->addColumn('name', 'string',array('limit' => 191,'default'=>'','comment'=>'名称'))
-            ->addColumn('pid', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'父级id'))
-            ->addColumn('sort', 'integer',array('signed'=>false,'limit' => 11,'default'=>100,'comment'=>'排序，升序取数据'))
+        $table = $this->table('guard_tokens',array('engine'=>config('custom.table_engine'),'comment'=>'=守卫验证'));
+        $table->addColumn('access_token', 'string',array('limit' => 323,'default'=>'','comment'=>'验证标志:必须填去掉前缀的表名'))
+            ->addColumn('guard', 'string',array('limit' => 191,'default'=>'','comment'=>'守卫'))
+            ->addColumn('token_type', 'string',array('limit' => 191,'default'=>'','comment'=>'类型'))
+            ->addColumn('expires_in', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'有效期'))
+            ->addColumn('is_forever', 'integer',array('signed'=>false,'limit' => \Phinx\Db\Adapter\MysqlAdapter::INT_TINY,'default'=>0,'comment'=>'是否永远不过期'))
+            ->addColumn('is_logout', 'integer',array('signed'=>false,'limit' => \Phinx\Db\Adapter\MysqlAdapter::INT_TINY,'default'=>0,'comment'=>'是否退出'))
             ->addColumn('create_time', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'创建时间'))
             ->addColumn('update_time', 'integer',array('signed'=>false,'limit' => 11,'default'=>0,'comment'=>'修改时间'))
+            ->addIndex(array('access_token'), array('unique' => true))
             ->create();
     }
 }
